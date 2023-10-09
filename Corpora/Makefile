@@ -1,3 +1,75 @@
+############### Makefile for making a distributable version of the ParlaMint and ParlaMint-en corpora
+
+### VARIABLES
+
+# All ParlaMint II corpora
+# CORPORA = AT BA BE BG CZ DK EE ES ES-CT ES-GA ES-PV FI FR GB GR HR HU IS IT LT LV NL NO PL PT RS RO SE SI TR UA
+# Missing corpora: FI LT RO ES-PV
+
+######## SUBMITTED CORPORA FOR V 3.1
+#CORPORA = AT BA BE BG CZ DK EE ES ES-CT ES-GA FR GB GR HR HU IS IT LV NL NO PL PT RS SE SI TR UA
+
+# Partial runs:
+#CORPORA = GR BG UA
+CORPORA = FI
+
+######## MTed CORPORA FOR V 3.1
+MT-CORPORA = AT-en BA-en BE-en BG-en CZ-en DK-en EE-en ES-en ES-CT-en ES-GA-en FR-en GR-en HR-en HU-en IS-en IT-en LV-en NL-en NO-en PL-en PT-en RS-en SE-en SI-en TR-en UA-en
+
+# Used in test targets:
+CORPUS = UK
+
+#Where things are, as we use several branches: this one (most likely dev), and documentation
+PARLAMINT = /project/corpora/Parla/ParlaMint/ParlaMint
+SCH = ${PARLAMINT}/Schema
+HERE = ${PARLAMINT}/Corpora
+TEMP = ${HERE}/Temp
+
+#Where the submitted corpora are found (ParlaMint- .TEI/ and .TEI.ana/
+SOURCES = ${HERE}/Sources-TEI
+SOURCES-MT = ${HERE}/Sources-Sem
+
+# Version number and PID of next(!) TEI and TEI.ana ParlaMint release
+VERSION = 3.1
+HANDLE-TEI = http://hdl.handle.net/11356/1859
+HANDLE-ANA = http://hdl.handle.net/11356/1860
+
+# Version number and PID of next MTed ParlaMint-en.ana release
+VERSION-MT = 3.1
+HANDLE-MT = http://hdl.handle.net/11356/1864
+
+#Where the produced corpora are put for inspection
+WEB = tomaz@nl.ijs.si:/home/tomaz/www/tmp/ParlaMint/
+
+###### Targets
+
+###### Tests
+test-tei1:
+	${FINALIZE} -tei -valid -codes FI -in ${HERE}/Temp -out ${HERE}/Temp/Out
+test-vert4:
+	$s meta=${HERE}/Master/ParlaMint-BG.TEI.ana/ParlaMint-BG.ana.xml -xsl:../Scripts/parlamint2xmlvert.xsl \
+	${HERE}/Master/ParlaMint-BG.TEI.ana/2014/ParlaMint-BG_2014-10-27.ana.xml > test.vert
+test-vert3:
+	$s meta=${HERE}/Master/ParlaMint-UA.TEI.ana/ParlaMint-UA.ana.xml -xsl:../Scripts/parlamint2xmlvert.xsl \
+	${HERE}/Master/ParlaMint-UA.TEI.ana/2012/ParlaMint-UA_2012-12-04-m0.ana.xml > test.vert
+test-vert2:
+	${FINALIZE} -vert -codes ES-PV -in ${HERE}/Master -out ${HERE}/Master
+test-vert1:
+	${FINALIZE} -vert -codes GR -in ${HERE}/Temp -out ${HERE}/Temp
+	${FINALIZE} -vert -codes GR-en -in ${HERE}/Temp -out ${HERE}/Temp
+test-conll3:
+	${FINALIZE} -conll -codes GR-en -in ${HERE}/Temp -out ${HERE}/Temp
+test-conll2:
+	${FINALIZE} -conll -codes GR -in ${HERE}/Temp -out ${HERE}/Temp
+test-conll1:
+	${FINALIZE} -conll -codes SI -in ${HERE}/Master -out ${HERE}/Master
+test-meta2:
+	$s meta=../Corpora/Master/ParlaMint-BE.TEI/ParlaMint-BE.xml -xsl:../Scripts/parlamint2meta.xsl \
+	../Corpora/Master/ParlaMint-BE.TEI/2014/ParlaMint-BE_2014-06-19-54-plenair-ip001x.xml > test.tsv
+test-meta1:
+	${FINALIZE} -txt -codes GR -in ${HERE}/Temp -out ${HERE}/Temp
+	${FINALIZE} -txt -codes GR-en -in ${HERE}/Temp -out ${HERE}/Temp
+
 ## Transliteration tests
 test-translit4:
 	${vlp} ParlaMint-GR-listPerson.xml
@@ -38,57 +110,13 @@ merge-taxos:
 	done;
 	${vta} Taxonomies/ParlaMint-taxonomy-*.xml
 
-############### Makefile for making a distributable version of the ParlaMint and ParlaMint-en corpora
-
-### VARIABLES
-
-# All ParlaMint II corpora
-# CORPORA = AT BA BE BG CZ DK EE ES ES-CT ES-GA ES-PV FI FR GB GR HR HU IS IT LT LV NL NO PL PT RS RO SE SI TR UA
-# Missing corpora: FI LT RO ES-PV
-
-######## SUBMITTED CORPORA FOR V 3.1
-#CORPORA = AT BA BE BG CZ DK EE ES ES-CT ES-GA FR GB GR HR HU IS IT LV NL NO PL PT RS SE SI TR UA
-
-# Partial runs:
-CORPORA = AT
-
-######## MTed CORPORA FOR V 3.1
-MT-CORPORA = AT-en BA-en BE-en BG-en CZ-en DK-en EE-en ES-en ES-CT-en ES-GA-en FR-en GR-en HR-en HU-en IS-en IT-en LV-en NL-en NO-en PL-en PT-en RS-en SE-en SI-en TR-en UA-en
-
-# Used in test targets:
-CORPUS = UA
-
-#Where things are, as we use several branches: this one (most likely dev), and documentation
-PARLAMINT = /project/corpora/Parla/ParlaMint/ParlaMint
-SCH = ${PARLAMINT}/Schema
-HERE = ${PARLAMINT}/Corpora
-TEMP = ${HERE}/Temp
-
-#Where the submitted corpora are found (ParlaMint- .TEI/ and .TEI.ana/
-SOURCES = ${HERE}/Sources-TEI
-SOURCES-MT = ${HERE}/Sources-MT
-
-# Version number and PID of next(!) TEI and TEI.ana ParlaMint release
-VERSION = 3.1
-HANDLE-TEI = http://hdl.handle.net/11356/1859
-HANDLE-ANA = http://hdl.handle.net/11356/1860
-
-# Version number and PID of next MTed ParlaMint-en.ana release
-VERSION-MT = 3.1
-HANDLE-MT = http://hdl.handle.net/11356/1864
-
-#Where the produced corpora are put for inspection
-WEB = tomaz@nl.ijs.si:/home/tomaz/www/tmp/ParlaMint/
-
-###### Targets
-
 ### Fixes for 3.1-en:
 
-# Instead of TEI-derived CoNLL-U files we release original MTed CoNLL-U
-# because they also contain word alignments 
+# Instead of TEI-derived CoNLL-U files we release MTed CoNLL-U
+# merged with TEI-derived CoNLL-U because they also contain word alignments 
 # Script also adds -en suffix to filesnames + readme.
 mt-cp-conllu:
-	bin/cp-conllu.pl validate '${SOURCES-MT}/ParlaMint-*-en.conllu' 'Master'
+	bin/cp-conllu.pl Master validate '${SOURCES-MT}/ParlaMint-*-en.conllu' 'Master'
 
 # Make txt and tsv files with tsvs
 mt-convert-txt:
@@ -249,9 +277,9 @@ mt-convert:
 
 mt-test8:
 	$s -xsl:../Scripts/validate-parlamint.xsl \
-	${HERE}/Master/ParlaMint-AT-en.TEI.ana/ParlaMint-AT-en.ana.xml
-	$s meta=${HERE}/Master/ParlaMint-AT-en.TEI.ana/ParlaMint-AT-en.ana.xml -xsl:../Scripts/validate-parlamint.xsl \
-	${HERE}/Master/ParlaMint-AT-en.TEI.ana/2022/ParlaMint-AT-en_2022-01-20-027-XXVII-NRSITZ-00139.ana.xml
+	${HERE}/Master/ParlaMint-UA.TEI.ana/ParlaMint-UA.ana.xml
+	$s meta=${HERE}/Master/ParlaMint-UA.TEI.ana/ParlaMint-UA.ana.xml -xsl:../Scripts/validate-parlamint.xsl \
+	${HERE}/Master/ParlaMint-UA.TEI.ana/2022/ParlaMint-UA_2022-01-25-m0.ana.xml
 mt-test7:
 	$s meta=${HERE}/Master/ParlaMint-AT-en.TEI.ana/ParlaMint-AT-en.ana.xml -xsl:../Scripts//check-links.xsl \
 	${HERE}/Master/ParlaMint-AT-en.TEI.ana/2022/ParlaMint-AT-en_2022-01-20-027-XXVII-NRSITZ-00139.ana.xml
@@ -276,7 +304,7 @@ mt-test2a:
 	perl ../Scripts/conllu2tei.pl < Test/0.conllu > Test/0.body.xml
 mt-test2:
 	perl ../Scripts/conllu2tei.pl \
-	< ${SOURCES-MT}/ParlaMint-LV-en.conllu/2015/ParlaMint-LV_2015-11-12-PT12-329.conllu \
+	< ${SOURCES-MT}/USAS/ParlaMint-LV-en.conllu/2015/ParlaMint-LV-en_2015-11-12-PT12-329.conllu \
 	> Test/ParlaMint-LV_2015-11-12-PT12-329.body.xml
 	xmllint --noout Test/ParlaMint-LV_2015-11-12-PT12-329.body.xml
 mt-test1:

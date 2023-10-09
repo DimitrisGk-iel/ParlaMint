@@ -15,6 +15,18 @@ for parla in $(jq -r '.[]' <<< $1 ); do
   echo "Cleaning old sample files [$parla]"
   rm -f ${DATADIR}/ParlaMint-$parla/ParlaMint-*.{txt,tsv,conllu,vert}
 
+  if [ $2 = '1' ] ; then
+    echo "INFO check whether are taxonomies translated"
+    make translateTaxonomies-$parla | sed "s/^\(.*\)\(\berror\b\)/::error::\1\2/i" | tee $DIR/taxonomies.log
+    make initTaxonomies-$parla
+    echo "INFO overwriting taxonomies that are expected to be translated"
+    make initTaxonomies4translation-$parla
+    make validateTaxonomies-$parla | sed "s/^\(.*\)\(\berror\b\)/::error:: incomplete taxonomy translation \1\2/i" | tee $DIR/taxonomies.log
+  else
+    echo "::warning:: INFO initialize taxonomies with no translations - check if correct(known) ids has been used"
+    make initTaxonomies-$parla
+  fi
+
   if [ -f "${DATADIR}/ParlaMint-$parla/ParlaMint-$parla.xml" ] ; then
 
     ( Scripts/validate-parlamint.pl Schema ${DATADIR}/ParlaMint-$parla 2>&1 || echo "ERROR: validate-parlamint.pl exited with <> 0" ) \
@@ -55,6 +67,10 @@ for parla in $(jq -r '.[]' <<< $1 ); do
     FAIL=1
     echo "::error:: ParlaMint-$parla validation failed"
   fi
+
+  echo "::warning:: TMP restore taxonomy"
+  git checkout Corpora/Taxonomies/ParlaMint-taxonomy*
+  git checkout ${DATADIR}/ParlaMint-$parla/ParlaMint-taxonomy*
 done
 
 if [ $FAIL -eq 1 ] ; then
